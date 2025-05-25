@@ -56,7 +56,7 @@ public class EquipmentService : IEquipmentService
 
   public async Task<EquipmentDto> CreateEquipmentAsync(CreateEquipmentDto createDto)
   {
-    // Default to warehouse if no location specified
+    // Default to warehouse if no location is specified
     var locationId = createDto.LocationId;
     if (locationId == null)
     {
