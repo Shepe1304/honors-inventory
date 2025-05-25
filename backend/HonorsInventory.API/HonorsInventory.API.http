@@ -1,6 +1,6 @@
-@HonorsInventory.API_HostAddress = http://localhost:5169
+@apiBaseUrl = http://localhost:5001
 
-GET {{HonorsInventory.API_HostAddress}}/weatherforecast/
+GET {{{{apiBaseUrl}}}}/weatherforecast/
 Accept: application/json
 
 ###
