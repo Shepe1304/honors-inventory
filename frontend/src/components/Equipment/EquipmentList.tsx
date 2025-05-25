@@ -7,6 +7,8 @@ import type {
 } from "../../types";
 import { Filter, Package, Search } from "lucide-react";
 import { EquipmentCard } from "./EquipmentCard";
+import { Modal } from "../Common/Modal";
+import { EditEquipmentForm } from "./EditEquipmentForm";
 
 interface EquipmentListProps {
   equipment: Equipment[];
@@ -19,11 +21,19 @@ interface EquipmentListProps {
 export const EquipmentList: React.FC<EquipmentListProps> = ({
   equipment,
   locations,
+  onUpdate,
   onDelete,
+  onTransfer,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterLocation, setFilterLocation] = useState<string>("all");
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
+    null
+  );
+  const [transferringEquipment, setTransferringEquipment] =
+    useState<Equipment | null>(null);
+
   // Get unique equipment types for filtering
   const equipmentTypes = Array.from(
     new Set(equipment.map((item) => item.equipmentType))
@@ -53,6 +63,15 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     groups[key].push(item);
     return groups;
   }, {} as Record<string, Equipment[]>);
+
+  const handleEdit = async (data: UpdateEquipmentDto) => {
+    if (!editingEquipment) return false;
+    const success = await onUpdate(editingEquipment.id, data);
+    if (success) {
+      setEditingEquipment(null);
+    }
+    return success;
+  };
 
   return (
     <div className="space-y-6">
@@ -163,9 +182,9 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
                     <EquipmentCard
                       key={item.id}
                       equipment={item}
-                      onEdit={() => {}}
+                      onEdit={() => setEditingEquipment(item)}
                       onDelete={() => onDelete(item.id)}
-                      onTransfer={() => {}}
+                      onTransfer={() => setTransferringEquipment(item)}
                     />
                   ))}
                 </div>
@@ -175,7 +194,22 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
         </div>
       )}
 
-      {/* TODO: Edit and Transfer */}
+      {/* Edit Modal */}
+      {editingEquipment && (
+        <Modal
+          isOpen={true}
+          onClose={() => setEditingEquipment(null)}
+          title="Edit Equipment"
+        >
+          <EditEquipmentForm
+            equipment={editingEquipment}
+            onSubmit={handleEdit}
+            onCancel={() => setEditingEquipment(null)}
+          />
+        </Modal>
+      )}
+
+      {/* TODO: Transfer item */}
     </div>
   );
 };
