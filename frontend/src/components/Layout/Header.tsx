@@ -1,5 +1,5 @@
-import React from 'react';
-import { Package } from 'lucide-react';
+import React from "react";
+import logo from "../../assets/honors-logo.png";
 
 export const Header: React.FC = () => {
   return (
@@ -7,10 +7,19 @@ export const Header: React.FC = () => {
     <header className="fixed w-screen bg-usf-green text-white shadow-lg z-100">
       <div className="px-6 py-4">
         <div className="flex items-center space-x-3">
-          <Package className="h-8 w-8 text-usf-gold" />
+          <div className="h-15 w-15 bg-white rounded-full flex justify-center items-center">
+            <img
+              src={logo}
+              alt="Honors College Logo"
+              className="h-full w-full object-contain"
+            />
+          </div>
+
           <div>
             <h1 className="text-2xl font-bold">Honors Inventory</h1>
-            <p className="text-usf-gold text-sm">University of South Florida - Honors College</p>
+            <p className="text-usf-gold text-sm">
+              University of South Florida - Honors College
+            </p>
           </div>
         </div>
       </div>

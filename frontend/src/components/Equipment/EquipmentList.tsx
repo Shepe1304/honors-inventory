@@ -35,6 +35,9 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
   const [transferringEquipment, setTransferringEquipment] =
     useState<Equipment | null>(null);
 
+  // New state for drag & drop between building types
+  const [draggedItem, setDraggedItem] = useState<number | null>(null);
+
   // Get unique equipment types for filtering
   const equipmentTypes = Array.from(
     new Set(equipment.map((item) => item.equipmentType))
@@ -83,6 +86,70 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     return success;
   };
 
+  const DropZone: React.FC<{
+    buildingType: string;
+    items: Equipment[];
+    children: React.ReactNode;
+  }> = ({ buildingType, items, children }) => {
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const handleDragOver = (e: React.DragEvent) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+    };
+
+    const handleDrop = async (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+
+      try {
+        const equipmentData = JSON.parse(
+          e.dataTransfer.getData("application/json")
+        );
+        if (equipmentData.buildingType !== buildingType) {
+          // Find a location that matches the target building type
+          const targetLocation = locations.find(
+            (loc) => loc.buildingType === buildingType
+          );
+          if (targetLocation) {
+            await onTransfer(equipmentData.id, {
+              newLocationId: targetLocation.id,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing dropped data:", error);
+      }
+    };
+
+    return (
+      <div
+        className={`transition-all duration-200 rounded-lg ${
+          isDragOver
+            ? "bg-blue-50 border-2 border-dashed border-blue-400 shadow-lg"
+            : "border-2 border-transparent"
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {children}
+        {isDragOver && items.length === 0 && (
+          <div className="text-center py-8 text-blue-600">
+            <Package className="mx-auto h-8 w-8 mb-2" />
+            <p className="text-sm font-medium">Drop equipment here</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -93,6 +160,9 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
           </h2>
           <p className="text-gray-600 mt-1">
             Manage and track IT equipment across {locations.length} locations
+          </p>
+          <p className="text-sm text-blue-600 mt-1">
+            💡 Drag equipment cards between sections to transfer them
           </p>
         </div>
         <div className="text-sm text-gray-500">
@@ -176,41 +246,57 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
       ) : (
         <div className="space-y-8">
           {["Warehouse", "Office", "Classroom"].map((buildingType) => {
-            const items = groupedEquipment[buildingType];
-            if (!items || items.length === 0) return null;
+            const items = groupedEquipment[buildingType] || [];
 
             return (
-              <div key={buildingType}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-                    <div
-                      className={`w-3 h-3 rounded-full mr-3 ${
-                        buildingType === "Warehouse"
-                          ? "bg-blue-500"
-                          : buildingType === "Office"
-                          ? "bg-green-500"
-                          : "bg-purple-500"
-                      }`}
-                    />
-                    {buildingType}
-                  </h3>
-                  <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    {items.length} items
-                  </span>
-                </div>
+              <DropZone
+                key={buildingType}
+                buildingType={buildingType}
+                items={items}
+              >
+                <div key={buildingType}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                      <div
+                        className={`w-3 h-3 rounded-full mr-3 ${
+                          buildingType === "Warehouse"
+                            ? "bg-blue-500"
+                            : buildingType === "Office"
+                            ? "bg-green-500"
+                            : "bg-purple-500"
+                        }`}
+                      />
+                      {buildingType}
+                    </h3>
+                    <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                      {items.length} items
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {items.map((item) => (
-                    <EquipmentCard
-                      key={item.id}
-                      equipment={item}
-                      onEdit={() => setEditingEquipment(item)}
-                      onDelete={() => onDelete(item.id)}
-                      onTransfer={() => setTransferringEquipment(item)}
-                    />
-                  ))}
+                  {items.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {items.map((item) => (
+                        <EquipmentCard
+                          key={item.id}
+                          equipment={item}
+                          onEdit={() => setEditingEquipment(item)}
+                          onDelete={() => onDelete(item.id)}
+                          onTransfer={() => setTransferringEquipment(item)}
+                          isDragging={draggedItem === item.id}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                      <Package className="mx-auto h-8 w-8 mb-2 text-gray-400" />
+                      <p className="text-sm">No equipment in this location</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Drag items here to move them
+                      </p>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </DropZone>
             );
           })}
         </div>
