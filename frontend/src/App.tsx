@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Header } from "./components/Layout/Header";
+import { Sidebar } from "./components/Layout/Sidebar";
 import { EquipmentList } from "./components/Equipment/EquipmentList";
+import { AddEquipmentForm } from "./components/Equipment/AddEquipmentForm";
 import { useEquipment } from "./hooks/useEquipment";
+import { LoadingSpinner } from "./components/Common/LoadingSpinner";
 
 type View = "dashboard" | "add-equipment";
 
@@ -26,11 +29,20 @@ function App() {
     return success;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="flex">
-        <main className="flex-1 p-6">
+      <div className="flex pt-25">
+        <Sidebar currentView={currentView} onViewChange={setCurrentView} />
+        <main className="flex-1 p-6 ml-64">
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {error}
@@ -44,6 +56,14 @@ function App() {
               onUpdate={updateEquipment}
               onDelete={deleteEquipment}
               onTransfer={transferEquipment}
+            />
+          )}
+
+          {currentView === "add-equipment" && (
+            <AddEquipmentForm
+              locations={locations}
+              onSubmit={handleAddEquipment}
+              onCancel={() => setCurrentView("dashboard")}
             />
           )}
         </main>

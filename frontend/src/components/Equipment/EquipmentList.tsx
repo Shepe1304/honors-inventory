@@ -105,23 +105,35 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Search
+              className="absolute left-3 text-gray-400 h-5 w-5"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
             <input
               type="text"
               placeholder="Search equipment by model, type, or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pl-10"
+              className="input-field pl-10 focus:border-usf-green"
             />
           </div>
 
           {/* Equipment Type Filter */}
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Filter
+              className="absolute left-3 text-gray-400 h-4 w-4"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="input-field pl-10 pr-8 appearance-none bg-white"
+              className="input-field pl-10 pr-8 appearance-none bg-white focus:border-usf-green"
             >
               <option value="all">All Types</option>
               {equipmentTypes.map((type) => (
@@ -137,7 +149,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
             <select
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
-              className="input-field appearance-none bg-white"
+              className="input-field appearance-none bg-white focus:border-usf-green"
             >
               <option value="all">All Locations</option>
               <option value="Warehouse">Warehouse</option>
