@@ -4,7 +4,7 @@ import { Package } from 'lucide-react';
 export const Header: React.FC = () => {
   return (
     // not yet responsive, TODO: make responsive later.
-    <header className="bg-usf-green text-white shadow-lg">
+    <header className="fixed w-screen bg-usf-green text-white shadow-lg z-100">
       <div className="px-6 py-4">
         <div className="flex items-center space-x-3">
           <Package className="h-8 w-8 text-usf-gold" />
