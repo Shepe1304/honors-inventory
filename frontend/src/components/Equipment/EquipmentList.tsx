@@ -9,6 +9,7 @@ import { Filter, Package, Search } from "lucide-react";
 import { EquipmentCard } from "./EquipmentCard";
 import { Modal } from "../Common/Modal";
 import { EditEquipmentForm } from "./EditEquipmentForm";
+import { TransferEquipmentModal } from "./TransferEquipmentModal";
 
 interface EquipmentListProps {
   equipment: Equipment[];
@@ -69,6 +70,15 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     const success = await onUpdate(editingEquipment.id, data);
     if (success) {
       setEditingEquipment(null);
+    }
+    return success;
+  };
+
+  const handleTransfer = async (data: TransferEquipmentDto) => {
+    if (!transferringEquipment) return false;
+    const success = await onTransfer(transferringEquipment.id, data);
+    if (success) {
+      setTransferringEquipment(null);
     }
     return success;
   };
@@ -209,7 +219,15 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
         </Modal>
       )}
 
-      {/* TODO: Transfer item */}
+      {/* Transfer Modal */}
+      {transferringEquipment && (
+        <TransferEquipmentModal
+          equipment={transferringEquipment}
+          locations={locations}
+          onTransfer={handleTransfer}
+          onClose={() => setTransferringEquipment(null)}
+        />
+      )}
     </div>
   );
 };
