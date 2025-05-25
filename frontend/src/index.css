@@ -2,7 +2,49 @@
 
 @theme {
   --color-usf-green: #006747;
-  --color-usf-gold: #FFD100;
-  --color-usf-green-light: #4A9B8A;
-  --color-usf-green-dark: #004B35;
+  --color-usf-gold: #ffd100;
+  --color-usf-green-light: #4a9b8a;
+  --color-usf-green-dark: #004b35;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    /* Detected font on USF website: Droid Sans WGL Regular with What The Font: https://www.myfonts.com/pages/whatthefont */
+    /* Can not use the font for free, so used Inter as alternative */
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-usf-green hover:bg-usf-green-dark text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-usf-green focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-usf-green border border-usf-green font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-usf-green focus:ring-offset-2;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-usf-green focus:border-transparent;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+  }
 }
