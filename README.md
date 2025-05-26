@@ -1,4 +1,4 @@
-# Honors Inventory Management System
+# Honors Inventory Management System - Simplified
 
 A full-stack inventory management application built for the University of South Florida Honors College IT Team. This system allows tracking, managing, and transferring IT equipment across different locations within the building.
 
@@ -175,7 +175,7 @@ The frontend will be available at `http://localhost:5173`
 ### 2. Check Frontend-Backend Communication
 
 - Open `http://localhost:5173` in your browser
-- You should see the Honors Inventory dashboard
+- You should see the Honors Inventory (Simplified) dashboard
 - Equipment should be loaded and displayed
 
 ### 3. Test Basic Functionality

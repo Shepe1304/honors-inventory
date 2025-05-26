@@ -16,7 +16,9 @@ export const Header: React.FC = () => {
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold">Honors Inventory</h1>
+            <h1 className="text-2xl font-bold">
+              Honors Inventory (Simplified)
+            </h1>
             <p className="text-usf-gold text-sm">
               University of South Florida - Honors College
             </p>
