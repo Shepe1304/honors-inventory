@@ -4,11 +4,11 @@ import autoTable from "jspdf-autotable";
 import type { Equipment } from "../../types";
 import honorsLogo from "../../assets/honorsLogoBase64"; // base64 logo string
 
-interface InvoicePreviewProps {
+interface SummaryPreviewProps {
   equipment: Equipment[];
 }
 
-export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
+export const SummaryPreview: React.FC<SummaryPreviewProps> = ({
   equipment,
 }) => {
   const tableRef = useRef<HTMLTableElement>(null);
@@ -32,7 +32,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.setTextColor("#006747");
-    doc.text("Honors Inventory (Simplified) Invoice", 38, 22);
+    doc.text("Honors Inventory (Simplified) Summary", 38, 22);
 
     // Summary Stats
     doc.setFontSize(12);
@@ -89,7 +89,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       doc.internal.pageSize.height - 10
     );
 
-    doc.save("honors-inventory-invoice.pdf");
+    doc.save("honors-inventory-summary.pdf");
   };
 
   const buildingStats = getBuildingStats();
@@ -98,7 +98,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-usf-green">Invoice Preview</h2>
+          <h2 className="text-2xl font-bold text-usf-green">Summary Preview</h2>
           <p className="text-sm text-gray-600">
             Honors College – University of South Florida
           </p>

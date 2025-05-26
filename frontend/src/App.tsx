@@ -12,7 +12,7 @@ import { AddEquipmentForm } from "./components/Equipment/AddEquipmentForm";
 import { useEquipment } from "./hooks/useEquipment";
 import { LoadingSpinner } from "./components/Common/LoadingSpinner";
 import { EquipmentList2 } from "./components/Equipment/EquipmentList2";
-import { InvoicePreview } from "./components/Reports/InvoicePreview";
+import { SummaryPreview } from "./components/Reports/SummaryPreview";
 
 function App() {
   const {
@@ -88,8 +88,8 @@ function App() {
                 }
               />
               <Route
-                path="/invoice"
-                element={<InvoicePreview equipment={equipment} />}
+                path="/summary"
+                element={<SummaryPreview equipment={equipment} />}
               />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
