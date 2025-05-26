@@ -1,7 +1,11 @@
+// Rule of thumb: Form because there are free-form input, custom fields, etc.
+// Rule of thumb: Modal if there's only dropdown selection involved
+
 import React, { useState } from "react";
 import type { Equipment, UpdateEquipmentDto } from "../../types";
 import { Edit } from "lucide-react";
 import { Button } from "../Common/Button";
+import { toast } from "sonner";
 
 interface EditEquipmentFormProps {
   equipment: Equipment;
@@ -58,6 +62,7 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // prevent scrolling back to top
 
     if (!validateForm()) return;
 
@@ -66,7 +71,14 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
       const success = await onSubmit(formData);
       if (!success) {
         // Form stays open if submission fails
+        toast.error("Failed to edit equipment");
+      } else {
+        toast.success("Equipment edited");
       }
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
