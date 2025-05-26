@@ -191,7 +191,7 @@ export const EquipmentList2 = ({
           <h2 className="text-3xl font-bold text-gray-900">
             Equipment Inventory
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-4">
             Manage and track IT equipment across {locations.length} locations
           </p>
           <p className="text-sm text-usf-green mt-1">
@@ -208,23 +208,35 @@ export const EquipmentList2 = ({
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Search
+              className="absolute left-3 text-gray-400 h-5 w-5"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
             <input
               type="text"
               placeholder="Search equipment by model, type, or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field pl-10 focus:border-usf-green"
             />
           </div>
 
           {/* Equipment Type Filter */}
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Filter
+              className="absolute left-3 text-gray-400 h-4 w-4"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              className="input-field pl-10 pr-8 appearance-none bg-white focus:border-usf-green"
             >
               <option value="all">All Types</option>
               {equipmentTypes.map((type) => (
@@ -233,20 +245,38 @@ export const EquipmentList2 = ({
                 </option>
               ))}
             </select>
+            <span
+              className="pointer-events-none absolute right-3 text-xs text-gray-500"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            >
+              ▼
+            </span>
           </div>
 
           {/* Location Filter */}
-          <div>
+          <div className="relative">
             <select
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              className="input-field appearance-none bg-white pr-8 focus:border-usf-green"
             >
               <option value="all">All Locations</option>
               <option value="Warehouse">Warehouse</option>
               <option value="Office">Office</option>
               <option value="Classroom">Classroom</option>
             </select>
+            <span
+              className="pointer-events-none absolute right-3 text-gray-500 text-xs"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            >
+              ▼
+            </span>
           </div>
         </div>
       </div>
@@ -268,6 +298,11 @@ export const EquipmentList2 = ({
         ) : (
           <div className="space-y-8">
             {["Warehouse", "Office", "Classroom"].map((buildingType) => {
+              // Skip rendering if a specific location filter is selected and doesn't match
+              if (filterLocation !== "all" && buildingType !== filterLocation) {
+                return null;
+              }
+
               const items = filteredEquipment.filter(
                 (e) => e.buildingType === buildingType
               );

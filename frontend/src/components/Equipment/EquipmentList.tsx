@@ -188,7 +188,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
           <h2 className="text-3xl font-bold text-gray-900">
             Equipment Inventory
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-4">
             Manage and track IT equipment across {locations.length} locations
           </p>
           {/* <p className="text-sm text-usf-green mt-1">
@@ -242,20 +242,38 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
                 </option>
               ))}
             </select>
+            <span
+              className="pointer-events-none absolute right-3 text-xs text-gray-500"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            >
+              ▼
+            </span>
           </div>
 
           {/* Location Filter */}
-          <div>
+          <div className="relative">
             <select
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
-              className="input-field appearance-none bg-white focus:border-usf-green"
+              className="input-field appearance-none bg-white pr-8 focus:border-usf-green"
             >
               <option value="all">All Locations</option>
               <option value="Warehouse">Warehouse</option>
               <option value="Office">Office</option>
               <option value="Classroom">Classroom</option>
             </select>
+            <span
+              className="pointer-events-none absolute right-3 text-xs text-gray-500"
+              style={{
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            >
+              ▼
+            </span>
           </div>
         </div>
       </div>
@@ -276,16 +294,17 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
       ) : (
         <div className="space-y-8">
           {["Warehouse", "Office", "Classroom"].map((buildingType) => {
+            // Skip if a filter is applied and doesn’t match
+            if (filterLocation !== "all" && buildingType !== filterLocation) {
+              return null;
+            }
+
             const items = groupedEquipment[buildingType] || [];
 
             return (
               <div key={buildingType}>
-                {/* <DropZone
-                key={buildingType}
-                buildingType={buildingType}
-                items={items}
-              > */}
-                <div key={buildingType}>
+                {/* <DropZone key={buildingType} buildingType={buildingType} items={items}> */}
+                <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-semibold text-gray-900 flex items-center">
                       <div
@@ -313,7 +332,6 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
                           onEdit={() => preserveScrollAndSetEdit(item)}
                           onTransfer={() => preserveScrollAndSetTransfer(item)}
                           onDelete={() => onDelete(item.id)}
-                          // isDragging={draggedItem === item.id}
                         />
                       ))}
                     </div>
@@ -322,8 +340,8 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
                       <Package className="mx-auto h-8 w-8 mb-2 text-gray-400" />
                       <p className="text-sm">No equipment in this location</p>
                       {/* <p className="text-xs text-gray-400 mt-1">
-                        Drag items here to move them
-                      </p> */}
+              Drag items here to move them
+            </p> */}
                     </div>
                   )}
                 </div>
