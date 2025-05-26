@@ -8,7 +8,7 @@ export const Sidebar: React.FC = () => {
   const menuItems = [
     { path: "/", label: "Dashboard", icon: Home },
     { path: "/add", label: "Add Equipment", icon: Plus },
-    { path: "/invoice", label: "Invoice Preview", icon: FileText },
+    { path: "/summary", label: "Summary Preview", icon: FileText },
   ];
 
   return (
