@@ -1,15 +1,18 @@
-// Uncomment all non-description lines for simple drag-and-drop functionality
-// (Better drag-and-drop functionality is available at EquipmentList2.tsx & EquipmentCard2.tsx)
-
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/core";
 import { useState } from "react";
+import { Package, Search, Filter } from "lucide-react";
 import type {
   Equipment,
   Location,
   TransferEquipmentDto,
   UpdateEquipmentDto,
 } from "../../types";
-import { Filter, Package, Search } from "lucide-react";
-import { EquipmentCard } from "./EquipmentCard";
+import { EquipmentCard2 } from "./EquipmentCard2";
 import { Modal } from "../Common/Modal";
 import { EditEquipmentForm } from "./EditEquipmentForm";
 import { TransferEquipmentModal } from "./TransferEquipmentModal";
@@ -22,28 +25,66 @@ interface EquipmentListProps {
   onTransfer: (id: number, data: TransferEquipmentDto) => Promise<boolean>;
 }
 
-export const EquipmentList: React.FC<EquipmentListProps> = ({
+// Drop zone component for building types
+const BuildingDropZone = ({
+  buildingType,
+  children,
+  isActive,
+}: {
+  buildingType: string;
+  children: React.ReactNode;
+  isActive: boolean;
+}) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: buildingType,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`transition-all duration-200 rounded-lg p-4 border-2 ${
+        isOver
+          ? "bg-blue-50 border-dashed border-blue-400 shadow-lg"
+          : "border-transparent"
+      }`}
+    >
+      {children}
+      {isOver && (
+        <div className="text-center py-4 text-blue-600">
+          <Package className="mx-auto h-6 w-6 mb-2" />
+          <p className="text-sm font-medium">Drop to transfer here</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const EquipmentList2 = ({
   equipment,
   locations,
+  onTransfer,
   onUpdate,
   onDelete,
-  onTransfer,
-}) => {
+}: EquipmentListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterLocation, setFilterLocation] = useState<string>("all");
-  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
+  const [activeId, setActiveId] = useState<number | null>(null);
+  const [activeEquipment, setActiveEquipment] = useState<Equipment | null>(
     null
   );
+
+  // Transfer modal states
   const [transferringEquipment, setTransferringEquipment] =
     useState<Equipment | null>(null);
-
   const [targetBuildingType, setTargetBuildingType] = useState<string | null>(
     null
   );
 
-  // For drag & drop between building types
-  // const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  // Edit modal state
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
+    null
+  );
 
   // Get unique equipment types for filtering
   const equipmentTypes = Array.from(
@@ -65,27 +106,32 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     return matchesSearch && matchesType && matchesLocation;
   });
 
-  // Group equipment by building type
-  const groupedEquipment = filteredEquipment.reduce((groups, item) => {
-    const key = item.buildingType;
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(item);
-    return groups;
-  }, {} as Record<string, Equipment[]>);
-
-  // Action handler: Edit equipment
-  const handleEdit = async (data: UpdateEquipmentDto) => {
-    if (!editingEquipment) return false;
-    const success = await onUpdate(editingEquipment.id, data);
-    if (success) {
-      setEditingEquipment(null);
-    }
-    return success;
+  const handleDragStart = (event: any) => {
+    const id = event.active.id;
+    const item = equipment.find((e) => e.id === id);
+    setActiveId(id);
+    setActiveEquipment(item || null);
   };
 
-  // Action handler: Transfer equipment
+  const handleDragEnd = (event: any) => {
+    const { over, active } = event;
+
+    if (over && active && activeEquipment) {
+      const newBuildingType = over.id;
+
+      // Only proceed if dropping into a different building type
+      if (newBuildingType !== activeEquipment.buildingType) {
+        // Set up transfer modal with target building type filter
+        setTargetBuildingType(newBuildingType);
+        setTransferringEquipment(activeEquipment);
+      }
+    }
+
+    setActiveId(null);
+    setActiveEquipment(null);
+  };
+
+  // Handle transfer with location selection
   const handleTransfer = async (data: TransferEquipmentDto) => {
     if (!transferringEquipment) return false;
     const success = await onTransfer(transferringEquipment.id, data);
@@ -96,13 +142,23 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     return success;
   };
 
+  // Handle edit
+  const handleEdit = async (data: UpdateEquipmentDto) => {
+    if (!editingEquipment) return false;
+    const success = await onUpdate(editingEquipment.id, data);
+    if (success) {
+      setEditingEquipment(null);
+    }
+    return success;
+  };
+
   // Get filtered locations for transfer modal
   const getFilteredLocations = () => {
     if (!targetBuildingType) return locations;
     return locations.filter((loc) => loc.buildingType === targetBuildingType);
   };
 
-  // Functions to preserve scroll and avoid page jumping to top
+  // Functions to preserve scroll
   const preserveScrollAndSetEdit = (item: Equipment) => {
     const scrollY = window.scrollY;
     setEditingEquipment(item);
@@ -115,70 +171,19 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     setTimeout(() => window.scrollTo(0, scrollY), 0);
   };
 
-  // Function with drag & drop logic
-  // const DropZone: React.FC<{
-  //   buildingType: string;
-  //   items: Equipment[];
-  //   children: React.ReactNode;
-  // }> = ({ buildingType, items, children }) => {
-  //   const [isDragOver, setIsDragOver] = useState(false);
-
-  //   const handleDragOver = (e: React.DragEvent) => {
-  //     e.preventDefault();
-  //     e.dataTransfer.dropEffect = "move";
-  //     setIsDragOver(true);
-  //   };
-
-  //   const handleDragLeave = (e: React.DragEvent) => {
-  //     e.preventDefault();
-  //     setIsDragOver(false);
-  //   };
-
-  //   const handleDrop = async (e: React.DragEvent) => {
-  //     e.preventDefault();
-  //     setIsDragOver(false);
-
-  //     try {
-  //       const equipmentData = JSON.parse(
-  //         e.dataTransfer.getData("application/json")
-  //       );
-  //       if (equipmentData.buildingType !== buildingType) {
-  //         // Find the equipment object to show in the transfer modal
-  //         const equipmentToTransfer = equipment.find(
-  //           (item) => item.id === equipmentData.id
-  //         );
-
-  //         if (equipmentToTransfer) {
-  //           setTargetBuildingType(buildingType);
-  //           setTransferringEquipment(equipmentToTransfer);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("Error parsing dropped data:", error);
-  //     }
-  //   };
-
-  //   return (
-  //     <div
-  //       className={`transition-all duration-200 rounded-lg ${
-  //         isDragOver
-  //           ? "bg-blue-50 border-2 border-dashed border-blue-400 shadow-lg"
-  //           : "border-2 border-transparent"
-  //       }`}
-  //       onDragOver={handleDragOver}
-  //       onDragLeave={handleDragLeave}
-  //       onDrop={handleDrop}
-  //     >
-  //       {children}
-  //       {isDragOver && items.length === 0 && (
-  //         <div className="text-center py-8 text-blue-600">
-  //           <Package className="mx-auto h-8 w-8 mb-2" />
-  //           <p className="text-sm font-medium">Drop equipment here</p>
-  //         </div>
-  //       )}
-  //     </div>
-  //   );
-  // };
+  const renderCard = (item: Equipment) => {
+    // const { attributes, listeners, setNodeRef } = useDraggable({ id: item.id });
+    return (
+      <EquipmentCard2
+        key={item.id}
+        equipment={item}
+        onEdit={() => preserveScrollAndSetEdit(item)}
+        onTransfer={() => preserveScrollAndSetTransfer(item)}
+        onDelete={() => onDelete(item.id)}
+        // dragProps={{ attributes, listeners, setNodeRef }}
+      />
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -191,9 +196,9 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
           <p className="text-gray-600 mt-1">
             Manage and track IT equipment across {locations.length} locations
           </p>
-          {/* <p className="text-sm text-usf-green mt-1">
+          <p className="text-sm text-usf-green mt-1">
             💡 Drag equipment cards between sections to transfer them
-          </p> */}
+          </p>
         </div>
         <div className="text-sm text-gray-500">
           Showing {filteredEquipment.length} of {equipment.length} items
@@ -201,39 +206,27 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
       </div>
 
       {/* Search and Filters */}
-      <div className="card">
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
-            <Search
-              className="absolute left-3 text-gray-400 h-5 w-5"
-              style={{
-                top: "50%",
-                transform: "translateY(-50%)",
-              }}
-            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
               type="text"
               placeholder="Search equipment by model, type, or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pl-10 focus:border-usf-green"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           {/* Equipment Type Filter */}
           <div className="relative">
-            <Filter
-              className="absolute left-3 text-gray-400 h-4 w-4"
-              style={{
-                top: "50%",
-                transform: "translateY(-50%)",
-              }}
-            />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="input-field pl-10 pr-8 appearance-none bg-white focus:border-usf-green"
+              className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               <option value="all">All Types</option>
               {equipmentTypes.map((type) => (
@@ -249,7 +242,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
             <select
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
-              className="input-field appearance-none bg-white focus:border-usf-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               <option value="all">All Locations</option>
               <option value="Warehouse">Warehouse</option>
@@ -260,32 +253,33 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
         </div>
       </div>
 
-      {/* Equipment Grouped Display */}
-      {Object.keys(groupedEquipment).length === 0 ? (
-        <div className="card text-center py-12">
-          <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No equipment found
-          </h3>
-          <p className="text-gray-500">
-            {searchTerm || filterType !== "all" || filterLocation !== "all"
-              ? "Try adjusting your search or filters"
-              : "Start by adding your first piece of equipment"}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {["Warehouse", "Office", "Classroom"].map((buildingType) => {
-            const items = groupedEquipment[buildingType] || [];
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        {/* Equipment Grouped Display */}
+        {filteredEquipment.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+            <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No equipment found
+            </h3>
+            <p className="text-gray-500">
+              {searchTerm || filterType !== "all" || filterLocation !== "all"
+                ? "Try adjusting your search or filters"
+                : "Start by adding your first piece of equipment"}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {["Warehouse", "Office", "Classroom"].map((buildingType) => {
+              const items = filteredEquipment.filter(
+                (e) => e.buildingType === buildingType
+              );
 
-            return (
-              <>
-                {/* <DropZone
-                key={buildingType}
-                buildingType={buildingType}
-                items={items}
-              > */}
-                <div key={buildingType}>
+              return (
+                <BuildingDropZone
+                  key={buildingType}
+                  buildingType={buildingType}
+                  isActive={activeId !== null}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-semibold text-gray-900 flex items-center">
                       <div
@@ -306,33 +300,34 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
 
                   {items.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {items.map((item) => (
-                        <EquipmentCard
-                          key={item.id}
-                          equipment={item}
-                          onEdit={() => preserveScrollAndSetEdit(item)}
-                          onTransfer={() => preserveScrollAndSetTransfer(item)}
-                          onDelete={() => onDelete(item.id)}
-                          // isDragging={draggedItem === item.id}
-                        />
-                      ))}
+                      {items.map((item) => renderCard(item))}
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
                       <Package className="mx-auto h-8 w-8 mb-2 text-gray-400" />
                       <p className="text-sm">No equipment in this location</p>
-                      {/* <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-1">
                         Drag items here to move them
-                      </p> */}
+                      </p>
                     </div>
                   )}
-                </div>
-                {/* </DropZone> */}
-              </>
-            );
-          })}
-        </div>
-      )}
+                </BuildingDropZone>
+              );
+            })}
+          </div>
+        )}
+
+        <DragOverlay>
+          {activeEquipment && (
+            <EquipmentCard2
+              equipment={activeEquipment}
+              onEdit={() => {}}
+              onTransfer={() => {}}
+              onDelete={() => {}}
+            />
+          )}
+        </DragOverlay>
+      </DndContext>
 
       {/* Edit Modal */}
       {editingEquipment && (
