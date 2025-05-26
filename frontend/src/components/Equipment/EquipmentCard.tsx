@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useRef } from "react";
 import type { Equipment } from "../../types";
-import { Edit, Trash2, ArrowRight, Calendar, MapPin } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  ArrowRight,
+  Calendar,
+  MapPin,
+  GripVertical,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface EquipmentCardProps {
@@ -68,28 +75,29 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
     });
   };
 
-  const handleDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData("application/json", JSON.stringify(equipment));
-    e.dataTransfer.effectAllowed = "move";
-  };
+  // For dragging card
+  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      className={`card hover:shadow-md transition-all duration-200 border border-1 border-gray-400 rounded-30 cursor-move ${
+      className={`card hover:shadow-md transition-all duration-200 border border-1 border-gray-400 rounded-30 select-text ${
         isDragging ? "opacity-50 scale-95" : ""
       }`}
-      draggable
-      onDragStart={handleDragStart}
+      ref={cardRef}
+      // draggable
+      // onDragStart={handleDragStart}
     >
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-1">
+          {/* Adding truncate to avoid text overflow */}
+          <h4 className="text-lg font-semibold text-gray-900 mb-1 max-w-[200px] truncate">
             {equipment.model}
           </h4>
           <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
             {equipment.equipmentType}
           </span>
         </div>
+
         <div className="flex space-x-1">
           <button
             type="button"
@@ -127,6 +135,26 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
           >
             <Trash2 className="h-4 w-4" />
           </button>
+
+          {/* Drag handle */}
+          <div
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData(
+                "application/json",
+                JSON.stringify(equipment)
+              );
+              e.dataTransfer.effectAllowed = "move";
+
+              if (cardRef.current) {
+                e.dataTransfer.setDragImage(cardRef.current, 0, 0);
+              }
+            }}
+            title="Drag to transfer"
+            className="cursor-grab p-2 text-gray-400 hover:text-gray-600"
+          >
+            <GripVertical className="w-4 h-4" />
+          </div>
         </div>
       </div>
 

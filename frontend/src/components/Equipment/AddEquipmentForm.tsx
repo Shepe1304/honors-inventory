@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useFormik } from "formik";
 import type { Location, CreateEquipmentDto } from "../../types";
 import { Package, Plus } from "lucide-react";
 import { Button } from "../Common/Button";
@@ -9,6 +10,7 @@ interface AddEquipmentFormProps {
   onCancel: () => void;
 }
 
+// TODO: Put these in database for scalability -- I just need to pull them from database instead of hard-coding them
 const EQUIPMENT_TYPES = [
   "Laptop",
   "Monitor",
@@ -32,57 +34,38 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [formData, setFormData] = useState<CreateEquipmentDto>({
-    model: "",
-    equipmentType: "",
-    locationId: undefined,
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
+  // Default location set to Warehouse
   const warehouseLocation = locations.find(
     (l) => l.buildingType === "Warehouse"
   );
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  // Using Formik because that's what I heard the Honors team uses
+  const formik = useFormik<CreateEquipmentDto>({
+    initialValues: {
+      model: "",
+      equipmentType: "",
+      locationId: undefined,
+    },
+    validate: (values) => {
+      const errors: Record<string, string> = {};
 
-    if (!formData.model.trim()) {
-      newErrors.model = "Model is required";
-    } else if (formData.model.length > 100) {
-      newErrors.model = "Model name must be less than 100 characters";
-    }
+      if (!values.model.trim()) {
+        errors.model = "Model is required";
+      } else if (values.model.length > 100) {
+        errors.model = "Model name must be less than 100 characters";
+      }
 
-    if (!formData.equipmentType) {
-      newErrors.equipmentType = "Equipment type is required";
-    }
+      if (!values.equipmentType) {
+        errors.equipmentType = "Equipment type is required";
+      }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit(formData);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleInputChange = (
-    field: keyof CreateEquipmentDto,
-    value: string | number | undefined
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
+      return errors;
+    },
+    onSubmit: async (values, { setSubmitting }) => {
+      await onSubmit(values);
+      setSubmitting(false);
+    },
+  });
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -101,7 +84,7 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
           {/* Equipment Model */}
           <div>
             <label htmlFor="model" className="label">
@@ -109,17 +92,21 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
             </label>
             <input
               id="model"
+              name="model"
               type="text"
               placeholder='e.g., Dell UltraSharp 24"'
-              value={formData.model}
-              onChange={(e) => handleInputChange("model", e.target.value)}
+              value={formik.values.model}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               className={`input-field ${
-                errors.model ? "border-red-500 focus:ring-red-500" : ""
+                formik.touched.model && formik.errors.model
+                  ? "border-red-500 focus:ring-red-500"
+                  : ""
               }`}
               maxLength={100}
             />
-            {errors.model && (
-              <p className="mt-1 text-sm text-red-600">{errors.model}</p>
+            {formik.touched.model && formik.errors.model && (
+              <p className="mt-1 text-sm text-red-600">{formik.errors.model}</p>
             )}
           </div>
 
@@ -130,12 +117,14 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
             </label>
             <select
               id="equipmentType"
-              value={formData.equipmentType}
-              onChange={(e) =>
-                handleInputChange("equipmentType", e.target.value)
-              }
+              name="equipmentType"
+              value={formik.values.equipmentType}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               className={`input-field ${
-                errors.equipmentType ? "border-red-500 focus:ring-red-500" : ""
+                formik.touched.equipmentType && formik.errors.equipmentType
+                  ? "border-red-500 focus:ring-red-500"
+                  : ""
               }`}
             >
               <option value="">Select equipment type...</option>
@@ -145,23 +134,24 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
                 </option>
               ))}
             </select>
-            {errors.equipmentType && (
+            {formik.touched.equipmentType && formik.errors.equipmentType && (
               <p className="mt-1 text-sm text-red-600">
-                {errors.equipmentType}
+                {formik.errors.equipmentType}
               </p>
             )}
           </div>
 
           {/* Location */}
           <div>
-            <label htmlFor="location" className="label">
+            <label htmlFor="locationId" className="label">
               Initial Location
             </label>
             <select
-              id="location"
-              value={formData.locationId || ""}
+              id="locationId"
+              name="locationId"
+              value={formik.values.locationId ?? ""}
               onChange={(e) =>
-                handleInputChange(
+                formik.setFieldValue(
                   "locationId",
                   e.target.value ? parseInt(e.target.value) : undefined
                 )
@@ -176,9 +166,9 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
               ))}
             </select>
             <p className="mt-1 text-sm text-gray-500">
-              {formData.locationId
+              {formik.values.locationId
                 ? `Equipment will be added to ${
-                    locations.find((l) => l.id === formData.locationId)
+                    locations.find((l) => l.id === formik.values.locationId)
                       ?.roomName
                   }`
                 : `Equipment will be added to ${
@@ -193,18 +183,18 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
               type="button"
               variant="secondary"
               onClick={onCancel}
-              disabled={isSubmitting}
+              disabled={formik.isSubmitting}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               variant="primary"
-              disabled={isSubmitting}
+              disabled={formik.isSubmitting}
               className="flex items-center space-x-2"
             >
               <Package className="h-4 w-4" />
-              <span>{isSubmitting ? "Adding..." : "Add Equipment"}</span>
+              <span>{formik.isSubmitting ? "Adding..." : "Add Equipment"}</span>
             </Button>
           </div>
         </form>
