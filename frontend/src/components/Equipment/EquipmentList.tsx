@@ -35,7 +35,12 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
   const [transferringEquipment, setTransferringEquipment] =
     useState<Equipment | null>(null);
 
-  // New state for drag & drop between building types
+  // For drag & drop filtering: Let users choose room in building when equipment card is dropped
+  const [targetBuildingType, setTargetBuildingType] = useState<string | null>(
+    null
+  );
+
+  // For drag & drop between building types
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
   // Get unique equipment types for filtering
@@ -68,6 +73,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     return groups;
   }, {} as Record<string, Equipment[]>);
 
+  // Action handler: Edit equipment
   const handleEdit = async (data: UpdateEquipmentDto) => {
     if (!editingEquipment) return false;
     const success = await onUpdate(editingEquipment.id, data);
@@ -77,15 +83,37 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
     return success;
   };
 
+  // Action handler: Transfer equipment
   const handleTransfer = async (data: TransferEquipmentDto) => {
     if (!transferringEquipment) return false;
     const success = await onTransfer(transferringEquipment.id, data);
     if (success) {
       setTransferringEquipment(null);
+      setTargetBuildingType(null);
     }
     return success;
   };
 
+  // Get filtered locations for transfer modal
+  const getFilteredLocations = () => {
+    if (!targetBuildingType) return locations;
+    return locations.filter((loc) => loc.buildingType === targetBuildingType);
+  };
+
+  // Functions to preserve scroll and avoid page jumping to top
+  const preserveScrollAndSetEdit = (item: Equipment) => {
+    const scrollY = window.scrollY;
+    setEditingEquipment(item);
+    setTimeout(() => window.scrollTo(0, scrollY), 0);
+  };
+
+  const preserveScrollAndSetTransfer = (item: Equipment) => {
+    const scrollY = window.scrollY;
+    setTransferringEquipment(item);
+    setTimeout(() => window.scrollTo(0, scrollY), 0);
+  };
+
+  // Function with drag & drop logic
   const DropZone: React.FC<{
     buildingType: string;
     items: Equipment[];
@@ -113,14 +141,14 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
           e.dataTransfer.getData("application/json")
         );
         if (equipmentData.buildingType !== buildingType) {
-          // Find a location that matches the target building type
-          const targetLocation = locations.find(
-            (loc) => loc.buildingType === buildingType
+          // Find the equipment object to show in the transfer modal
+          const equipmentToTransfer = equipment.find(
+            (item) => item.id === equipmentData.id
           );
-          if (targetLocation) {
-            await onTransfer(equipmentData.id, {
-              newLocationId: targetLocation.id,
-            });
+
+          if (equipmentToTransfer) {
+            setTargetBuildingType(buildingType);
+            setTransferringEquipment(equipmentToTransfer);
           }
         }
       } catch (error) {
@@ -161,7 +189,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
           <p className="text-gray-600 mt-1">
             Manage and track IT equipment across {locations.length} locations
           </p>
-          <p className="text-sm text-blue-600 mt-1">
+          <p className="text-sm text-usf-green mt-1">
             💡 Drag equipment cards between sections to transfer them
           </p>
         </div>
@@ -279,9 +307,11 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
                         <EquipmentCard
                           key={item.id}
                           equipment={item}
-                          onEdit={() => setEditingEquipment(item)}
+                          // onEdit={() => setEditingEquipment(item)}
+                          // onTransfer={() => setTransferringEquipment(item)}
+                          onEdit={() => preserveScrollAndSetEdit(item)}
+                          onTransfer={() => preserveScrollAndSetTransfer(item)}
                           onDelete={() => onDelete(item.id)}
-                          onTransfer={() => setTransferringEquipment(item)}
                           isDragging={draggedItem === item.id}
                         />
                       ))}
@@ -321,9 +351,12 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
       {transferringEquipment && (
         <TransferEquipmentModal
           equipment={transferringEquipment}
-          locations={locations}
+          locations={getFilteredLocations()}
           onTransfer={handleTransfer}
-          onClose={() => setTransferringEquipment(null)}
+          onClose={() => {
+            setTransferringEquipment(null);
+            setTargetBuildingType(null);
+          }}
         />
       )}
     </div>
