@@ -1,3 +1,6 @@
+// Uncomment all non-description lines for simple drag-and-drop functionality
+// (Better drag-and-drop functionality is available at EquipmentList2.tsx & EquipmentCard2.tsx)
+
 import React, { useRef } from "react";
 import type { Equipment } from "../../types";
 import {
@@ -6,7 +9,7 @@ import {
   ArrowRight,
   Calendar,
   MapPin,
-  GripVertical,
+  // GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,7 +18,7 @@ interface EquipmentCardProps {
   onEdit: () => void;
   onDelete: () => void;
   onTransfer: () => void;
-  isDragging: boolean;
+  // isDragging: boolean;
 }
 
 export const EquipmentCard: React.FC<EquipmentCardProps> = ({
@@ -23,23 +26,9 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
   onEdit,
   onDelete,
   onTransfer,
-  isDragging,
+  // isDragging,
 }) => {
   const handleDelete = () => {
-    // if (window.confirm(`Are you sure you want to delete ${equipment.model}?`)) {
-    //   onDelete();
-    // }
-
-    // toast(`Are you sure you want to delete "${equipment.model}"?`, {
-    //   action: {
-    //     label: "Delete",
-    //     onClick: () => {
-    //       onDelete();
-    //       toast.success("Equipment deleted");
-    //     },
-    //   },
-    // });
-
     toast.custom((t) => (
       <div className="bg-white border border-gray-400 shadow-lg rounded-lg p-4 w-80 text-sm text-gray-800">
         <p className="mb-4">
@@ -76,16 +65,12 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
   };
 
   // For dragging card
-  const cardRef = useRef<HTMLDivElement>(null);
+  // const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      className={`card hover:shadow-md transition-all duration-200 border border-1 border-gray-400 rounded-30 select-text ${
-        isDragging ? "opacity-50 scale-95" : ""
-      }`}
-      ref={cardRef}
-      // draggable
-      // onDragStart={handleDragStart}
+      className={`card hover:shadow-md transition-all duration-200 border border-1 border-gray-400 rounded-30 select-text`}
+      // ref={cardRef}
     >
       <div className="flex justify-between items-start mb-4">
         <div>
@@ -103,7 +88,7 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              e.stopPropagation(); // to avoid conflict on drag & drop
+              // e.stopPropagation(); // to avoid conflict on drag & drop
               onEdit();
             }}
             className="p-2 text-gray-500 hover:text-usf-green hover:bg-gray-100 rounded-lg transition-colors duration-200 cursor-pointer"
@@ -115,7 +100,7 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              e.stopPropagation(); // to avoid conflict on drag & drop
+              // e.stopPropagation(); // to avoid conflict on drag & drop
               onTransfer();
             }}
             className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 cursor-pointer"
@@ -127,7 +112,7 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              e.stopPropagation(); // to avoid conflict on drag & drop
+              // e.stopPropagation(); // to avoid conflict on drag & drop
               handleDelete();
             }}
             className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 cursor-pointer"
@@ -137,7 +122,7 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
           </button>
 
           {/* Drag handle */}
-          <div
+          {/* <div
             draggable
             onDragStart={(e) => {
               e.dataTransfer.setData(
@@ -154,7 +139,7 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
             className="cursor-grab p-2 text-gray-400 hover:text-gray-600"
           >
             <GripVertical className="w-4 h-4" />
-          </div>
+          </div> */}
         </div>
       </div>
 

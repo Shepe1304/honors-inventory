@@ -5,6 +5,7 @@ import { EquipmentList } from "./components/Equipment/EquipmentList";
 import { AddEquipmentForm } from "./components/Equipment/AddEquipmentForm";
 import { useEquipment } from "./hooks/useEquipment";
 import { LoadingSpinner } from "./components/Common/LoadingSpinner";
+import { EquipmentList2 } from "./components/Equipment/EquipmentList2";
 
 type View = "dashboard" | "add-equipment";
 
@@ -49,6 +50,15 @@ function App() {
             </div>
           )}
 
+          {/* {currentView === "dashboard" && (
+            <EquipmentList2
+              equipment={equipment}
+              locations={locations}
+              onUpdate={updateEquipment}
+              onDelete={deleteEquipment}
+              onTransfer={transferEquipment}
+            />
+          )} */}
           {currentView === "dashboard" && (
             <EquipmentList
               equipment={equipment}
