@@ -1,5 +1,5 @@
 // Rule of thumb: Form because there are free-form input, custom fields, etc.
-// Rule of thumb: Modal if there's only dropdown selection involved
+// Rule of thumb: Modal if there's only dropdown selection involved (No need for Formik because there's only 1 field)
 
 import React, { useState } from "react";
 import type { Equipment, Location, TransferEquipmentDto } from "../../types";

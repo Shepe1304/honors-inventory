@@ -1,7 +1,5 @@
-// Rule of thumb: Form because there are free-form input, custom fields, etc.
-// Rule of thumb: Modal if there's only dropdown selection involved
-
-import React, { useState } from "react";
+import React from "react";
+import { useFormik } from "formik";
 import type { Equipment, UpdateEquipmentDto } from "../../types";
 import { Edit } from "lucide-react";
 import { Button } from "../Common/Button";
@@ -13,6 +11,7 @@ interface EditEquipmentFormProps {
   onCancel: () => void;
 }
 
+// TODO: Can put all of these inside database instead
 const EQUIPMENT_TYPES = [
   "Laptop",
   "Monitor",
@@ -36,67 +35,47 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [formData, setFormData] = useState<UpdateEquipmentDto>({
-    model: equipment.model,
-    equipmentType: equipment.equipmentType,
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.model.trim()) {
-      newErrors.model = "Model is required";
-    } else if (formData.model.length > 100) {
-      newErrors.model = "Model name must be less than 100 characters";
-    }
-
-    if (!formData.equipmentType) {
-      newErrors.equipmentType = "Equipment type is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation(); // prevent scrolling back to top
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-    try {
-      const success = await onSubmit(formData);
-      if (!success) {
-        // Form stays open if submission fails
-        toast.error("Failed to edit equipment");
-      } else {
-        toast.success("Equipment edited");
+  const formik = useFormik<UpdateEquipmentDto>({
+    initialValues: {
+      model: equipment.model,
+      equipmentType: equipment.equipmentType,
+    },
+    validate: (values) => {
+      const errors: Record<string, string> = {};
+      if (!values.model.trim()) {
+        errors.model = "Model is required";
+      } else if (values.model.length > 100) {
+        errors.model = "Model name must be less than 100 characters";
       }
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An unexpected error occurred";
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
-  const handleInputChange = (
-    field: keyof UpdateEquipmentDto,
-    value: string
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
+      if (!values.equipmentType) {
+        errors.equipmentType = "Equipment type is required";
+      }
+
+      return errors;
+    },
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const success = await onSubmit(values);
+        if (success) {
+          toast.success("Equipment edited");
+        } else {
+          toast.error("Failed to edit equipment");
+        }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unexpected error occurred";
+        toast.error(errorMessage);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    enableReinitialize: true, // in case the modal is reused with different `equipment`
+  });
 
   const hasChanges =
-    formData.model !== equipment.model ||
-    formData.equipmentType !== equipment.equipmentType;
+    formik.values.model !== equipment.model ||
+    formik.values.equipmentType !== equipment.equipmentType;
 
   return (
     <div className="w-full max-w-md" style={{ zIndex: "1000" }}>
@@ -114,7 +93,7 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         {/* Equipment Model */}
         <div>
           <label htmlFor="edit-model" className="label">
@@ -122,17 +101,21 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
           </label>
           <input
             id="edit-model"
+            name="model"
             type="text"
             placeholder='e.g., Dell UltraSharp 24"'
-            value={formData.model}
-            onChange={(e) => handleInputChange("model", e.target.value)}
+            value={formik.values.model}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className={`input-field ${
-              errors.model ? "border-red-500 focus:ring-red-500" : ""
+              formik.touched.model && formik.errors.model
+                ? "border-red-500 focus:ring-red-500"
+                : ""
             }`}
             maxLength={100}
           />
-          {errors.model && (
-            <p className="mt-1 text-sm text-red-600">{errors.model}</p>
+          {formik.touched.model && formik.errors.model && (
+            <p className="mt-1 text-sm text-red-600">{formik.errors.model}</p>
           )}
         </div>
 
@@ -143,10 +126,14 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
           </label>
           <select
             id="edit-equipmentType"
-            value={formData.equipmentType}
-            onChange={(e) => handleInputChange("equipmentType", e.target.value)}
+            name="equipmentType"
+            value={formik.values.equipmentType}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className={`input-field ${
-              errors.equipmentType ? "border-red-500 focus:ring-red-500" : ""
+              formik.touched.equipmentType && formik.errors.equipmentType
+                ? "border-red-500 focus:ring-red-500"
+                : ""
             }`}
           >
             <option value="">Select equipment type...</option>
@@ -156,8 +143,10 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
               </option>
             ))}
           </select>
-          {errors.equipmentType && (
-            <p className="mt-1 text-sm text-red-600">{errors.equipmentType}</p>
+          {formik.touched.equipmentType && formik.errors.equipmentType && (
+            <p className="mt-1 text-sm text-red-600">
+              {formik.errors.equipmentType}
+            </p>
           )}
         </div>
 
@@ -167,16 +156,16 @@ export const EditEquipmentForm: React.FC<EditEquipmentFormProps> = ({
             type="button"
             variant="secondary"
             onClick={onCancel}
-            disabled={isSubmitting}
+            disabled={formik.isSubmitting}
           >
             Cancel
           </Button>
           <Button
             type="submit"
             variant="primary"
-            disabled={isSubmitting || !hasChanges}
+            disabled={formik.isSubmitting || !hasChanges}
           >
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {formik.isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </form>
