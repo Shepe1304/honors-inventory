@@ -8,6 +8,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import type { Equipment } from "../../types";
+import { toast } from "sonner";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -25,6 +26,34 @@ export const EquipmentCard2: React.FC<EquipmentCardProps> = ({
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: equipment.id,
   });
+
+  const handleDelete = () => {
+    toast.custom((t) => (
+      <div className="bg-white border border-gray-400 shadow-lg rounded-lg p-4 w-80 text-sm text-gray-800">
+        <p className="mb-4">
+          Are you sure you want to delete <strong>{equipment.model}</strong>?
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => toast.dismiss(t)}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              onDelete();
+              toast.dismiss(t);
+              toast.success("Equipment deleted");
+            }}
+            className="text-red-600 hover:text-red-800 font-medium transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ));
+  };
 
   return (
     <div
@@ -57,7 +86,7 @@ export const EquipmentCard2: React.FC<EquipmentCardProps> = ({
             <ArrowRight className="h-4 w-4" />
           </button>
           <button
-            onClick={onDelete}
+            onClick={handleDelete}
             className="p-2 text-gray-500 hover:text-red-600 transition-colors"
           >
             <Trash2 className="h-4 w-4" />

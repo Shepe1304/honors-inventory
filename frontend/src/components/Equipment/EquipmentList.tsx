@@ -279,7 +279,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
             const items = groupedEquipment[buildingType] || [];
 
             return (
-              <>
+              <div key={buildingType}>
                 {/* <DropZone
                 key={buildingType}
                 buildingType={buildingType}
@@ -328,7 +328,7 @@ export const EquipmentList: React.FC<EquipmentListProps> = ({
                   )}
                 </div>
                 {/* </DropZone> */}
-              </>
+              </div>
             );
           })}
         </div>

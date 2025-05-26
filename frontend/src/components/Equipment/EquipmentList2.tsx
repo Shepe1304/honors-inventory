@@ -172,7 +172,6 @@ export const EquipmentList2 = ({
   };
 
   const renderCard = (item: Equipment) => {
-    // const { attributes, listeners, setNodeRef } = useDraggable({ id: item.id });
     return (
       <EquipmentCard2
         key={item.id}
@@ -180,7 +179,6 @@ export const EquipmentList2 = ({
         onEdit={() => preserveScrollAndSetEdit(item)}
         onTransfer={() => preserveScrollAndSetTransfer(item)}
         onDelete={() => onDelete(item.id)}
-        // dragProps={{ attributes, listeners, setNodeRef }}
       />
     );
   };

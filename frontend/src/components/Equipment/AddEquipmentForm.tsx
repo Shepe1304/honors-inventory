@@ -3,6 +3,8 @@ import { useFormik } from "formik";
 import type { Location, CreateEquipmentDto } from "../../types";
 import { Package, Plus } from "lucide-react";
 import { Button } from "../Common/Button";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 interface AddEquipmentFormProps {
   locations: Location[];
@@ -34,6 +36,9 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
+  // To redirect to dashboard
+  const navigate = useNavigate();
+
   // Default location set to Warehouse
   const warehouseLocation = locations.find(
     (l) => l.buildingType === "Warehouse"
@@ -62,8 +67,12 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
       return errors;
     },
     onSubmit: async (values, { setSubmitting }) => {
-      await onSubmit(values);
+      const success = await onSubmit(values);
       setSubmitting(false);
+      if (success) {
+        toast.success("Equipment added");
+        navigate("/");
+      }
     },
   });
 
@@ -101,7 +110,7 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
               className={`input-field ${
                 formik.touched.model && formik.errors.model
                   ? "border-red-500 focus:ring-red-500"
-                  : ""
+                  : "focus:border-usf-green"
               }`}
               maxLength={100}
             />
@@ -111,7 +120,7 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
           </div>
 
           {/* Equipment Type */}
-          <div>
+          <div className="focus:border-usf-green">
             <label htmlFor="equipmentType" className="label">
               Equipment Type *
             </label>
@@ -124,7 +133,7 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
               className={`input-field ${
                 formik.touched.equipmentType && formik.errors.equipmentType
                   ? "border-red-500 focus:ring-red-500"
-                  : ""
+                  : "focus:border-usf-green"
               }`}
             >
               <option value="">Select equipment type...</option>
@@ -156,7 +165,7 @@ export const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
                   e.target.value ? parseInt(e.target.value) : undefined
                 )
               }
-              className="input-field"
+              className="input-field focus:border-usf-green"
             >
               <option value="">Default to Warehouse</option>
               {locations.map((location) => (
