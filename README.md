@@ -188,7 +188,7 @@ info: Microsoft.Hosting.Lifetime[14]
       Now listening on: https://localhost:5001
 ```
 
-The API will be available at `https://localhost:5001` and Swagger documentation at `https://localhost:5001/swagger`
+The API will be available at `https://localhost:5001` and Swagger documentation at `http://localhost:5001/swagger`
 
 ### Step 5: Frontend Setup
 
