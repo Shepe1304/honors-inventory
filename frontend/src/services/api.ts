@@ -22,7 +22,7 @@ const api = axios.create({
 // Request interceptor for debugging
 api.interceptors.request.use(
   (config) => {
-    console.log("API Request:", config.method?.toUpperCase(), config.url);
+    // console.log("API Request:", config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => Promise.reject(error)

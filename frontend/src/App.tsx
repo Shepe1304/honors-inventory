@@ -15,6 +15,8 @@ import { EquipmentList2 } from "./components/Equipment/EquipmentList2";
 import { SummaryPreview } from "./components/Reports/SummaryPreview";
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const {
     equipment,
     locations,
@@ -42,10 +44,10 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex pt-25">
-          <Sidebar />
-          <main className="flex-1 p-6 ml-64">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
+        <div className="flex flex-col md:flex-row pt-25">
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <main className="flex-1 p-4 md:p-6 md:ml-64">
             {error && (
               <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                 {error}
