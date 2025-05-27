@@ -235,6 +235,7 @@ honors-inventory/
 ├── README.md                          # This file
 ├── .gitignore                         # Git ignore rules
 ├── honors.sln                         # Visual Studio solution file
+├── screenshots/                       # Screenshots for README.md
 ├── database/
 │   └── schema.sql                     # Database creation script
 ├── backend/
