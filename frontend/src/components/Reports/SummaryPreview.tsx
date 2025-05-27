@@ -95,10 +95,12 @@ export const SummaryPreview: React.FC<SummaryPreviewProps> = ({
   const buildingStats = getBuildingStats();
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-6xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-usf-green">Summary Preview</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-usf-green">
+            Summary Preview
+          </h2>
           <p className="text-sm text-gray-600">
             Honors College – University of South Florida
           </p>
@@ -115,7 +117,7 @@ export const SummaryPreview: React.FC<SummaryPreviewProps> = ({
         </div>
         <button
           onClick={handleDownloadPDF}
-          className="bg-usf-green hover:bg-usf-green-dark text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+          className="w-full sm:w-auto bg-usf-green hover:bg-usf-green-dark text-white font-medium py-2 px-4 rounded-lg transition duration-200"
         >
           Download PDF
         </button>

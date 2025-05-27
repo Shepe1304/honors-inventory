@@ -36,7 +36,7 @@ export const EquipmentCard2: React.FC<EquipmentCardProps> = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={() => toast.dismiss(t)}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
           >
             Cancel
           </button>
@@ -46,7 +46,7 @@ export const EquipmentCard2: React.FC<EquipmentCardProps> = ({
               toast.dismiss(t);
               toast.success("Equipment deleted");
             }}
-            className="text-red-600 hover:text-red-800 font-medium transition-colors"
+            className="text-red-600 hover:text-red-800 font-medium transition-colors cursor-pointer"
           >
             Delete
           </button>
@@ -64,7 +64,10 @@ export const EquipmentCard2: React.FC<EquipmentCardProps> = ({
     >
       <div className="flex justify-between items-start mb-4">
         <div className="min-w-0 flex-1">
-          <h4 className="text-lg font-semibold text-gray-900 truncate">
+          <h4
+            className="text-lg font-semibold text-gray-900 truncate"
+            title={equipment.model}
+          >
             {equipment.model}
           </h4>
           <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
@@ -96,7 +99,10 @@ export const EquipmentCard2: React.FC<EquipmentCardProps> = ({
           <button
             {...listeners}
             {...attributes}
-            className="p-2 cursor-grab text-gray-400 hover:text-gray-600 cursor-grip"
+            className="p-2 cursor-grab text-gray-400 hover:text-gray-600"
+            style={{
+              cursor: "grab",
+            }}
             title="Drag"
           >
             <GripVertical className="h-4 w-4" />
@@ -134,7 +140,10 @@ export const CardPreview = ({ equipment }: { equipment: Equipment }) => (
   <div className="card bg-white border border-gray-400 rounded-lg p-4 transition-all select-text">
     <div className="flex justify-between items-start mb-4">
       <div className="min-w-0 flex-1">
-        <h4 className="text-lg font-semibold text-gray-900 truncate">
+        <h4
+          className="text-lg font-semibold text-gray-900 truncate"
+          title={equipment.model}
+        >
           {equipment.model}
         </h4>
         <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">

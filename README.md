@@ -6,17 +6,24 @@ A full-stack inventory management application built for the University of South 
 
 **Frontend:**
 
-- React 18 with TypeScript
-- Vite (build tool)
-- Tailwind CSS (styling)
-- Axios (HTTP client)
+- React 19 with TypeScript
+- Vite 6.3+ (build tool)
+- Tailwind CSS 4.1+ (styling)
+- Axios 1.9+ (HTTP client)
+- React Router 7.6+ (routing)
+- Formik 2.4+ (form management)
+- Lucide React 0.511+ (icons)
+- @dnd-kit/core 6.3+ (drag and drop functionality)
+- Sonner 2.0+ (toast notifications)
+- jsPDF 3.0+ with autotable (PDF generation)
 
 **Backend:**
 
 - ASP.NET Core 9.0
-- Entity Framework Core
+- Entity Framework Core 9.0 (preview)
 - SQL Server (can be configured for other databases)
 - RESTful API architecture
+- Swagger/OpenAPI documentation
 
 **Database:**
 
@@ -31,6 +38,8 @@ The application follows the University of South Florida's official branding:
 - **Secondary Gold**: `#FFD100` (USF Gold)
 - Clean, academic layout with modern UI components
 - Responsive design for desktop and mobile use
+- Drag-and-drop interface for intuitive equipment management
+- Toast notifications for user feedback
 
 ## Prerequisites
 
@@ -43,7 +52,7 @@ Before running this project, make sure you have the following installed:
 
 - **.NET 9.0 SDK**
 
-  - Download from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/8.0)
+  - Download from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/9.0)
   - Verify installation: `dotnet --version`
 
 - **SQL Server** (one of the following):
@@ -155,7 +164,7 @@ npm run dev
 You should see output similar to:
 
 ```
-  VITE v5.0.8  ready in 500 ms
+  VITE v6.3.5  ready in 500 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
@@ -182,8 +191,10 @@ The frontend will be available at `http://localhost:5173`
 
 - Try adding new equipment
 - Try editing existing equipment
-- Try transferring equipment between locations
+- Try transferring equipment between locations (drag-and-drop or forms)
 - Try searching and filtering
+- Try generating PDF reports
+- Test toast notifications for user feedback
 
 ## Troubleshooting
 
@@ -194,21 +205,84 @@ The frontend will be available at `http://localhost:5173`
 ```
 honors-inventory/
 ├── README.md                          # This file
+├── .gitignore                         # Git ignore rules
+├── honors.sln                         # Visual Studio solution file
 ├── database/
 │   └── schema.sql                     # Database creation script
 ├── backend/
 │   └── HonorsInventory.API/           # ASP.NET Core API
+│       ├── HonorsInventory.API.csproj # Project file
+│       ├── HonorsInventory.API.http   # HTTP test file
+│       ├── Program.cs                 # Application entry point
+│       ├── appsettings.json           # Configuration
+│       ├── appsettings.Development.json # Dev configuration
+│       ├── bin/Debug/net9.0/          # Build output
+│       ├── obj/                       # Build intermediates
+│       ├── Properties/
+│       │   └── launchSettings.json    # Launch configuration
 │       ├── Controllers/               # API endpoints
+│       │   ├── EquipmentController.cs
+│       │   └── LocationsController.cs
 │       ├── Models/                    # Data models and DTOs
+│       │   ├── Equipment.cs
+│       │   ├── Location.cs
+│       │   └── DTOs/
 │       ├── Data/                      # Entity Framework context
+│       │   ├── InventoryContext.cs
+│       │   └── DbInitializer.cs
 │       └── Services/                  # Business logic
+│           ├── EquipmentService.cs
+│           └── IEquipmentService.cs
 └── frontend/
-    ├── src/
-    │   ├── components/                # React components
-    │   ├── services/                  # API communication
-    │   ├── hooks/                     # Custom React hooks
-    │   └── types/                     # TypeScript definitions
-    └── package.json                   # Frontend dependencies
+    ├── node_modules/                  # Node dependencies
+    ├── package.json                   # Frontend dependencies
+    ├── package-lock.json              # Dependency lock file
+    ├── README.md                      # Frontend-specific README
+    ├── tsconfig.json                  # TypeScript configuration
+    ├── tsconfig.app.json              # App-specific TypeScript config
+    ├── tsconfig.node.json             # Node-specific TypeScript config
+    ├── eslint.config.js               # ESLint configuration
+    ├── vite.config.ts                 # Vite build configuration
+    ├── index.html                     # Main HTML template
+    ├── .env                           # Environment variables
+    ├── .gitignore                     # Git ignore rules
+    ├── public/
+    │   ├── honors-logo.png            # USF Honors logo
+    │   ├── honors-logo.svg            # USF Honors logo (SVG)
+    │   └── vite.svg                   # Vite default logo
+    └── src/
+        ├── main.tsx                   # Application entry point
+        ├── App.tsx                    # Root component
+        ├── index.css                  # Global styles
+        ├── vite-env.d.ts              # Vite type definitions
+        ├── assets/                    # Static assets
+        │   ├── honors-logo.png
+        │   ├── honorsLogoBase64.ts    # Base64 encoded logo
+        │   └── react.svg
+        ├── types/
+        │   └── index.ts               # TypeScript type definitions
+        ├── services/
+        │   └── api.ts                 # API communication layer
+        ├── hooks/
+        │   └── useEquipment.ts        # Custom React hooks
+        └── components/                # React components
+            ├── Layout/
+            │   ├── Header.tsx
+            │   └── Sidebar.tsx
+            ├── Common/
+            │   ├── Button.tsx
+            │   ├── LoadingSpinner.tsx
+            │   └── Modal.tsx
+            ├── Equipment/
+            │   ├── AddEquipmentForm.tsx
+            │   ├── EditEquipmentForm.tsx
+            │   ├── EquipmentCard.tsx
+            │   ├── EquipmentCard2.tsx
+            │   ├── EquipmentList.tsx
+            │   ├── EquipmentList2.tsx
+            │   └── TransferEquipmentModal.tsx
+            └── Reports/
+                └── SummaryPreview.tsx
 ```
 
 ## API Endpoints
@@ -232,10 +306,30 @@ Once running, these endpoints will be available:
 
 - **Equipment Management**: Add, edit, delete, and view IT equipment
 - **Location Tracking**: Track equipment across Warehouse, Office, and Classroom locations
-- **Transfer System**: Move equipment between locations with audit trail
+- **Transfer System**: Move equipment between locations with audit trail and drag-and-drop interface
 - **Search & Filter**: Find equipment by type, model, or location
+- **PDF Export**: Generate equipment reports and documentation
+- **Form Management**: Robust form handling with validation using Formik
+- **Toast Notifications**: Real-time user feedback with Sonner
+- **Modern Icons**: Comprehensive icon set with Lucide React
 - **Responsive Design**: Works on desktop and mobile devices
 - **Type Safety**: Full TypeScript implementation for better development experience
+- **Modern React**: Built with React 19 and latest patterns
+
+## Available Scripts
+
+### Frontend
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+### Backend
+
+- `dotnet run` - Start development server
+- `dotnet build` - Build the project
+- `dotnet restore` - Restore NuGet packages
 
 ## Contributing
 

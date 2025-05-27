@@ -75,7 +75,10 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({
       <div className="flex justify-between items-start mb-4">
         <div>
           {/* Adding truncate to avoid text overflow */}
-          <h4 className="text-lg font-semibold text-gray-900 mb-1 max-w-[200px] truncate">
+          <h4
+            className="text-lg font-semibold text-gray-900 mb-1 max-w-[200px] truncate"
+            title={equipment.model}
+          >
             {equipment.model}
           </h4>
           <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
