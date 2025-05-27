@@ -114,7 +114,18 @@ git clone https://github.com/Shepe1304/honors-inventory.git
 cd honors-inventory
 ```
 
-### Step 2: Database Setup
+### Step 2: Configure Environment Variables
+
+Create a .env file in the frontend folder with the following content:
+
+```env
+# To connect with backend
+VITE_API_BASE_URL=http://localhost:5001/api
+```
+
+Note: The backend runs on HTTP by default at http://localhost:5001. If your backend is running on a different port or protocol (HTTPS), update the VITE_API_BASE_URL accordingly.
+
+### Step 3: Database Setup
 
 #### Using SQL Server Management Studio (SSMS)
 
@@ -130,7 +141,7 @@ cd honors-inventory
 3. Open the file `database/schema.sql` or Create a new query then copy and paste the contents of `database/schema.sql`
 4. Execute the script to create the database and sample data
 
-### Step 3: Backend Setup
+### Step 4: Backend Setup
 
 ```bash
 # Navigate to the backend project folder
@@ -178,7 +189,7 @@ info: Microsoft.Hosting.Lifetime[14]
 
 The API will be available at `https://localhost:5001` and Swagger documentation at `https://localhost:5001/swagger`
 
-### Step 4: Frontend Setup
+### Step 5: Frontend Setup
 
 Open a **new terminal window** and navigate to the frontend folder:
 
@@ -266,6 +277,7 @@ honors-inventory/
     ├── node_modules/                  # Node dependencies
     ├── package.json                   # Frontend dependencies
     ├── package-lock.json              # Dependency lock file
+    ├── .env                           # Environment variables
     ├── README.md                      # Frontend-specific README
     ├── tsconfig.json                  # TypeScript configuration
     ├── tsconfig.app.json              # App-specific TypeScript config
