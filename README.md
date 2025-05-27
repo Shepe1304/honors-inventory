@@ -2,7 +2,47 @@
 
 A full-stack inventory management application built for the University of South Florida Honors College IT Team. This system allows tracking, managing, and transferring IT equipment across different locations within the building.
 
+## Table of Contents
+
+- [Demo](#demo)
+- [Tech Stack](#tech-stack)
+- [Design](#design)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
+  - [Step 2: Database Setup](#step-2-database-setup)
+  - [Step 3: Backend Setup](#step-3-backend-setup)
+  - [Step 4: Frontend Setup](#step-4-frontend-setup)
+- [Verification Steps](#verification-steps)
+- [Troubleshooting](#troubleshooting)
+- [Project Structure Overview](#project-structure-overview)
+- [API Endpoints](#api-endpoints)
+- [Features](#features)
+- [Available Scripts](#available-scripts)
+- [Getting Help](#getting-help)
+
+## Demo
+
+### Live Application Demo
+
+![Application Demo](screenshots/app-demo.gif)
+_Complete workflow: adding equipment, transferring between locations, and generating reports_
+
+### Key Features
+
+| Dashboard                               | Equipment Management                              | Drag and Drop                            |
+| --------------------------------------- | ------------------------------------------------- | ---------------------------------------- |
+| ![Dashboard](screenshots/dashboard.png) | ![Equipment List](screenshots/equipment-list.png) | ![PDF Report](screenshots/drag-drop.png) |
+
+| Add Equipment Form                | PDF Report Preview                            | Mobile View                                |
+| --------------------------------- | --------------------------------------------- | ------------------------------------------ |
+| ![Dashboard](screenshots/add.png) | ![Equipment List](screenshots/pdf-report.png) | ![PDF Report](screenshots/mobile-view.png) |
+
 ## Tech Stack
+
+![.NET](https://img.shields.io/badge/.NET-9.0-blue)
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 
 **Frontend:**
 
@@ -76,7 +116,7 @@ cd honors-inventory
 
 ### Step 2: Database Setup
 
-#### Option A: Using SQL Server Management Studio (SSMS)
+#### Using SQL Server Management Studio (SSMS)
 
 1. Open SQL Server Management Studio
 2. Connect to your SQL Server instance
@@ -89,14 +129,6 @@ cd honors-inventory
    )
 3. Open the file `database/schema.sql` or Create a new query then copy and paste the contents of `database/schema.sql`
 4. Execute the script to create the database and sample data
-
-#### Option B: Using Azure Data Studio
-
-1. Open Azure Data Studio
-2. Connect to your SQL Server instance
-3. Create a new query
-4. Copy and paste the contents of `database/schema.sql`
-5. Execute the script
 
 ### Step 3: Backend Setup
 
@@ -195,10 +227,6 @@ The frontend will be available at `http://localhost:5173`
 - Try searching and filtering
 - Try generating PDF reports
 - Test toast notifications for user feedback
-
-## Troubleshooting
-
-### Common Issues and Solutions
 
 ## Project Structure Overview
 
@@ -330,14 +358,6 @@ Once running, these endpoints will be available:
 - `dotnet run` - Start development server
 - `dotnet build` - Build the project
 - `dotnet restore` - Restore NuGet packages
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## Getting Help
 
