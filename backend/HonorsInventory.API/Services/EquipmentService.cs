@@ -1,3 +1,5 @@
+// Service used by Equipment Controller
+
 using HonorsInventory.API.Data;
 using HonorsInventory.API.Models;
 using HonorsInventory.API.Models.DTOs;

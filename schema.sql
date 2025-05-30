@@ -1,6 +1,8 @@
 -- Create the database tables:
 -- Equipment (Cols: Id, Model, EquipmentType, LocationId, CreatedAt, UpdatedAt) and Locations (Cols: Id, RoomName, BuildingName)
 
+-- This file can also be found in database/ folder
+
 
 -- Create database if it doesn't exist
 IF DB_ID('HonorsInventoryDb') IS NULL
