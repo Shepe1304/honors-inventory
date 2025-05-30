@@ -248,8 +248,9 @@ honors-inventory/
 ├── .gitignore                         # Git ignore rules
 ├── honors.sln                         # Visual Studio solution file
 ├── screenshots/                       # Screenshots for README.md
+├── schema.sql                         # SQL script to create and populate the database, placed at the root as required by the challenge
 ├── database/
-│   └── schema.sql                     # Database creation script
+│   └── schema.sql                     # Duplicate of the schema for internal organization and consistency within the database folder
 ├── backend/
 │   └── HonorsInventory.API/           # ASP.NET Core API
 │       ├── HonorsInventory.API.csproj # Project file

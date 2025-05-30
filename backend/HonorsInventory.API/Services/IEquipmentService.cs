@@ -1,3 +1,5 @@
+// Interface defining equipment's logic methods.
+
 using HonorsInventory.API.Models.DTOs;
 
 namespace HonorsInventory.API.Services;

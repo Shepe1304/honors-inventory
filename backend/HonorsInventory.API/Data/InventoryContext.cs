@@ -1,3 +1,5 @@
+// maps C# models to database tables
+
 using HonorsInventory.API.Models;
 using Microsoft.EntityFrameworkCore;
 

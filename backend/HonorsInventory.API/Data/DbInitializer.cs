@@ -1,3 +1,5 @@
+// Seeds database with tester data
+
 using HonorsInventory.API.Models;
 
 namespace HonorsInventory.API.Data;
